@@ -1,9 +1,7 @@
 package com.blockone.enrollment.controllers;
 
-import com.blockone.enrollment.exceptions.CreditLimitExceededException;
-import com.blockone.enrollment.models.Enrollment;
 import com.blockone.enrollment.models.Student;
-import com.blockone.enrollment.service.ClassService;
+import com.blockone.enrollment.models.StudentResponse;
 import com.blockone.enrollment.service.EnrollmentService;
 import com.blockone.enrollment.service.StudentService;
 import org.slf4j.Logger;
@@ -22,78 +20,97 @@ import java.util.List;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class StudentsController {
+
     private final Logger log = LoggerFactory.getLogger(StudentsController.class);
+
     @Autowired
     StudentService studentService;
 
     @Autowired
     EnrollmentService enrollmentService;
 
+    /**
+     * Gets Student information and Create the record in DB
+     * @Param student
+     * @return ResponseEntity<StudentResponse>
+     */
     @PostMapping(path="/students")
-    public Student createStudent(@RequestBody Student student) {
-        log.debug("StudentsController.createStudent() START");
+    public ResponseEntity<StudentResponse> createStudent(@RequestBody Student student) {
+        log.info("StudentsController.createStudent()");
         //Call service to create Student and return updated Student info
         student.setCreateDate(LocalDate.now());
-        studentService.saveStudent(student);
-        return student;
+        //Student Obj saved in DB, send Student id to client
+        return new ResponseEntity(new StudentResponse(studentService.saveStudent(student).getStudentId(),
+                "Student Record Created. Use Get Request to get Student Details"), HttpStatus.CREATED);
     }
 
+    /**
+     * Gets Student information and Student Id and Update the record in DB
+     * @Param student
+     * @Param studentId
+     * @return ResponseEntity<StudentResponse>
+     */
     @PutMapping(path="/students/{studentId}")
-    public Student modifyStudent(@RequestBody Student student, @PathVariable Long studentId) {
-        log.debug("StudentsController.modifyStudent() START");
+    public ResponseEntity<StudentResponse> modifyStudent(@RequestBody Student student, @PathVariable Long studentId) {
+        log.info("StudentsController.modifyStudent()");
         //Call service to modify Student and return updated Student info
-        student.setId(studentId);
-        studentService.saveStudent(student);
-        return student;
+        student.setStudentId(studentId);
+        //Student Obj saved in DB, send Student id to client
+        return new ResponseEntity(new StudentResponse(studentService.saveStudent(student).getStudentId(),
+                "Student Record Updated. Use Get Request to get Student Details"), HttpStatus.OK);
     }
 
+    /**
+     * Get Student Details based on Student Id
+     * @Param studentId
+     * @return Student
+     */
     @GetMapping(path="/students/{studentId}")
     public Student getStudentById(@PathVariable Long studentId) {
-        log.debug("StudentsController.getStudentById() START");
-        return studentService.getStudentById(studentId);
+        log.info("StudentsController.getStudentById - {}", studentId );
+        //Call Service to Get Student by Id
+        Student student = studentService.getStudentById(studentId);
+        log.info("Student information retrieved - {}", studentId );
+        return student;
     }
 
-    @PostMapping(path="/enroll")
-    public Enrollment enrollStudent(@RequestBody Enrollment enrollment) throws CreditLimitExceededException{
-        log.debug("StudentsController.enrollStudent() START");
-        enrollment.setEnrollmentDate(LocalDate.now());
-        enrollment.setLastUpdateDate(LocalDate.now());
-        enrollment.setActiveIndicator(true);
-        return enrollmentService.saveEnrollment(enrollment);
-    }
-
-    @PostMapping(path="/withdraw")
-    public Enrollment withdrawStudent(@RequestBody Enrollment enrollment) {
-        log.debug("StudentsController.withdrawStudent() START");
-        enrollment.setLastUpdateDate(LocalDate.now());
-        enrollment.setActiveIndicator(false);
-        return enrollmentService.saveEnrollment(enrollment);
-    }
-
+    /**
+     * Get all Students enrolled for Class
+     * @Param className
+     * @return List<Student>
+     */
     @GetMapping(path="/classes/{className}/students")
-    public List<Enrollment> getStudentsByClassName(@PathVariable("className") String className) {
-        log.debug("StudentsController.getStudentsByClassId() START");
-        //TODO - Not working
-       return enrollmentService.getAllStudentsByClass(className);
+    public List<Student> getStudentsByClassName(@PathVariable("className") String className) {
+        log.info("StudentsController.getStudentsByClassName {}", className);
+        //Call EnrollmentService to get all Enrollments for Class
+        return studentService.getAllStudentsByClass(className);
     }
 
+    /**
+     * Get all Students for Semester
+     * @Param semesterId
+     * @return List<Student>
+     */
     @GetMapping(path="/semesters/{semesterId}/students")
-    public List<Enrollment> getStudentsBySemester(@PathVariable("semesterId") Long semesterId) {
-        log.debug("StudentsController.getStudentsByClassId() START");
-        return enrollmentService.getAllStudentsForSemester(semesterId);
+    public List<Student> getStudentsBySemester(@PathVariable("semesterId") Long semesterId) {
+        log.info("StudentsController.getStudentsBySemester - {}", semesterId);
+        //Call Service Method to get all Enrollments for Semester
+        return studentService.getAllStudentsForSemester(semesterId);
     }
 
+    /**
+     * Get all Students for Class in Semester
+     * @Param className
+     * @Param semesterId
+     * @return List<Student>
+     */
     @GetMapping(path="/semesters/{semesterId}/classes/{className}/students")
-    public List<Enrollment> getStudentsForClassInSemester(@PathVariable("className") String className,
+    public List<Student> getStudentsForClassInSemester(@PathVariable("className") String className,
                                         @PathVariable("semesterId") Long semesterId) {
-        log.debug("StudentsController.getStudentsForClassInSemester() START");
-
-        //Delete Student from enrollment table
-        return enrollmentService.getAllStudentsEnrolledForClassInSemester(className, semesterId);
-        //return new Student();
+        log.info("StudentsController.getStudentsForClassInSemester - className [{}], " +
+                "semesterId [{}]", className, semesterId);
+        //Get enrollments for class in semester
+        return studentService.getAllStudentsForClassInSemester(className, semesterId);
     }
-
-
-
 }
 

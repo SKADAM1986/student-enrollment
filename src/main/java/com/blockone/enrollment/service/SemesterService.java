@@ -2,6 +2,7 @@ package com.blockone.enrollment.service;
 
 import com.blockone.enrollment.models.Semester;
 import com.blockone.enrollment.repository.SemesterRepository;
+import com.blockone.enrollment.util.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,16 +15,20 @@ public class SemesterService {
     @Autowired
     SemesterRepository semesterRepository;
 
+    @Autowired
+    ObjectMapper objectMapper;
+
     public Semester createSemester(Semester semester){
-        //Add record in Semester Table and return semester id
-        log.debug("Semester.createSemester() START");
-        semesterRepository.save(semester);
-        return semester;
+        log.info("Semester.createSemester()");
+        com.blockone.enrollment.entity.Semester s = semesterRepository.save(objectMapper.convertToEntity(semester));
+        return objectMapper.convertToModel(s);
     }
 
     @Cacheable("semester")
-    public Semester getSemesterDetails(String semName) {
-        log.debug("Semester.getSemesterDetails() START");
-        return semesterRepository.findBySemName(semName);
+    public Semester getSemesterDetails(Long semId) {
+        log.info("Semester.getSemesterDetails()");
+        return objectMapper.convertToModel(semesterRepository.findBySemId(semId));
     }
+
+
 }

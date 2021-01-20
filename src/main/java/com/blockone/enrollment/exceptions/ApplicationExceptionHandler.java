@@ -17,18 +17,41 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler {
     private final Logger log = LoggerFactory.getLogger(ApplicationExceptionHandler.class);
 
+    /**
+     * CreditLimitExceededException is handled and appropriate response is sent to client
+     * @Param ex
+     * @return ResponseEntity<Object>
+     */
     @ExceptionHandler(CreditLimitExceededException.class)
     protected ResponseEntity<Object> handleCreditLimitExceededException(
             CreditLimitExceededException ex) {
-        log.error("ApplicationExceptionHandler.handleCreditLimitExceededException() START");
-        return new ResponseEntity<>(new ErrorResponse(ex.getMessage(), "1000"),HttpStatus.NOT_FOUND);
+        log.error("ApplicationExceptionHandler.handleCreditLimitExceededException");
+        return new ResponseEntity<>(new ErrorResponse(HttpStatus.EXPECTATION_FAILED.value(), ex.getMessage()),HttpStatus.EXPECTATION_FAILED);
     }
 
+    /**
+     * DataNotFoundException is handled and appropriate response is sent to client
+     * @Param ex
+     * @return ResponseEntity<Object>
+     */
+    @ExceptionHandler(DataNotFoundException.class)
+    protected ResponseEntity<Object> handleDataNotFoundException(
+            DataNotFoundException ex) {
+        log.error("ApplicationExceptionHandler.handleDataNotFoundException");
+        return new ResponseEntity<>(new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage()),HttpStatus.NOT_FOUND);
+    }
+
+
+    /**
+     *  All types of Exceptions will be handled and appropriate response is sent to client
+     * @Param ex
+     * @return ResponseEntity<Object>
+     */
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<Object> handleException(
             Exception ex) {
-        log.error("ApplicationExceptionHandler.handleException() START");
-        return new ResponseEntity<>(new ErrorResponse(ex.getMessage(), "500"),HttpStatus.INTERNAL_SERVER_ERROR);
+        log.error("ApplicationExceptionHandler.handleException");
+        return new ResponseEntity<>(new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }

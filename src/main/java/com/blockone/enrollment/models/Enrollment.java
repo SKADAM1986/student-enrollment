@@ -2,8 +2,6 @@ package com.blockone.enrollment.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
-import javax.persistence.*;
-import java.io.Serializable;
 import java.time.LocalDate;
 
 @Getter
@@ -12,22 +10,18 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @ToString
 @EqualsAndHashCode
-@Entity
-@Table(name="enrollment")
-public class Enrollment  implements Serializable {
+public class Enrollment {
 
-    @EmbeddedId
-    EnrollmentId enrollmentId;
+    private Student student;
+    private Semester semester;
+    private ClassType classType;
 
-    @Column(name="enrollment_date", nullable = true)
-    @JsonFormat(pattern="dd/MM/yyyy")
+    @JsonFormat(pattern="MM/dd/yyyy")
     private LocalDate enrollmentDate;
 
-    @Column(name="last_update_date")
-    @JsonFormat(pattern="dd/MM/yyyy")
+    @JsonFormat(pattern="MM/dd/yyyy")
     private LocalDate lastUpdateDate;
 
-    @Column(name="active_indicator")
     private boolean activeIndicator;
 
 }

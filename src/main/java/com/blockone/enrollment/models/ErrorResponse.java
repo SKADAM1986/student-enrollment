@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @ToString
 public class ErrorResponse {
+    int errorCode;
     String errorMessage;
-    String errorCode;
 
 }
