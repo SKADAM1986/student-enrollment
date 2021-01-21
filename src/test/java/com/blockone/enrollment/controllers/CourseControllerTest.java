@@ -20,7 +20,7 @@ import java.util.List;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
-class CourseControllerTest {
+public class ClassControllerTest {
 
     @InjectMocks
     ClassController classController;
