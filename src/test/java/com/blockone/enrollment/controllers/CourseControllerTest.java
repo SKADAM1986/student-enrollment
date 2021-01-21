@@ -4,7 +4,6 @@ import com.blockone.enrollment.models.ClassType;
 import com.blockone.enrollment.service.ClassService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,7 +19,7 @@ import java.util.List;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
-public class ClassControllerTest {
+class CourseControllerTest {
 
     @InjectMocks
     ClassController classController;
@@ -64,5 +63,12 @@ public class ClassControllerTest {
     {
         when(classService.getClassesBySemesterStudent(nullable(Long.class), nullable(Long.class))).thenReturn(Collections.emptyList());
         Assertions.assertEquals(Collections.emptyList(), classController.getClassesForStudentsInSemester(null, null));
+    }
+
+    @Test
+    void testGetAllClasses()
+    {
+        when(classService.getAllClasses(nullable(Long.class), nullable(Long.class))).thenReturn(list);
+        Assertions.assertEquals(list, classController.getAllClassesEnrolled(null, null));
     }
 }

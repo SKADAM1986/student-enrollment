@@ -35,7 +35,7 @@ public class SemesterController {
         //insert data in semester table
         Semester s = semesterService.createSemester(semester);
         //Semester Obj saved in DB, send Semester id to client
-        return new ResponseEntity<SemesterResponse>(new SemesterResponse(s.getSemId(),
+        return new ResponseEntity<SemesterResponse>(new SemesterResponse(s.getSemesterId(),
                 "New Semester is Created. Use Get Request to get Semester Details"), HttpStatus.CREATED);
     }
 

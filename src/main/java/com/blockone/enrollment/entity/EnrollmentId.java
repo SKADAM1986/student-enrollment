@@ -32,7 +32,7 @@ public class EnrollmentId implements Serializable {
 
         return "EnrollmentId{" +
                 "studentId=" + student.getStudentId() +
-                ", semesterId=" + semester.getSemId() +
+                ", semesterId=" + semester.getSemesterId() +
                 ", className=" + classType.getClassName() +
                 '}';
     }

@@ -167,7 +167,7 @@ class EnrollmentServiceTest {
     @Test
     void testGetAllEnrollmentsBySemester_Positive()
     {
-        when(enrollmentRepository.findAllByEnrollmentId_SemesterSemIdAndActiveIndicatorIsTrue(any(Long.class))).thenReturn(enrollmentEntityList);
+        when(enrollmentRepository.findAllByEnrollmentId_SemesterSemesterIdAndActiveIndicatorIsTrue(any(Long.class))).thenReturn(enrollmentEntityList);
         when(objectMapper.convertToModel(e1Entity)).thenReturn(e1Model);
         when(objectMapper.convertToModel(e2Entity)).thenReturn(e2Model);
 
@@ -183,7 +183,7 @@ class EnrollmentServiceTest {
     @Test
     void testGetAllEnrollmentsByClassAndSemester_Positive()
     {
-        when(enrollmentRepository.findAllByEnrollmentId_SemesterSemIdAndEnrollmentId_ClassType_ClassNameAndActiveIndicatorIsTrue(any(Long.class)
+        when(enrollmentRepository.findAllByEnrollmentId_SemesterSemesterIdAndEnrollmentId_ClassType_ClassNameAndActiveIndicatorIsTrue(any(Long.class)
                 , any(String.class))).thenReturn(enrollmentEntityList);
         when(objectMapper.convertToModel(e1Entity)).thenReturn(e1Model);
         when(objectMapper.convertToModel(e2Entity)).thenReturn(e2Model);

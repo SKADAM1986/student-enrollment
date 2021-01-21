@@ -55,7 +55,7 @@ public class StudentService {
     public List<Student> getAllStudentsByClass(String className) {
         log.info("StudentServiceFetch.getAllStudentsByClass -[{}]", className );
         return enrollmentService.getAllEnrollmentsByClass(className).stream().map(
-                Enrollment::getStudent).collect(Collectors.toList());
+                Enrollment::getStudent).distinct().collect(Collectors.toList());
     }
 
     /**
@@ -67,7 +67,7 @@ public class StudentService {
     public List<Student> getAllStudentsForSemester(Long semesterId) {
         log.info("StudentService.getAllStudentsByClass -[{}]", semesterId);
         return enrollmentService.getAllEnrollmentsForSemester(semesterId).stream().map(
-                Enrollment::getStudent).collect(Collectors.toList());
+                Enrollment::getStudent).distinct().collect(Collectors.toList());
     }
 
     /**
@@ -80,6 +80,6 @@ public class StudentService {
     public List<Student> getAllStudentsForClassInSemester(String className,Long semId) {
         log.info("StudentService.getAllStudentsForClassInSemester - className - [{}], semesterId -[{}]", className, semId);
         return enrollmentService.getAllEnrollmentsForClassInSemester(className, semId).stream().map(
-                Enrollment::getStudent).collect(Collectors.toList());
+                Enrollment::getStudent).distinct().collect(Collectors.toList());
     }
 }

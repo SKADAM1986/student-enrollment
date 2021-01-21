@@ -26,7 +26,9 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
     protected ResponseEntity<Object> handleCreditLimitExceededException(
             CreditLimitExceededException ex) {
         log.error("ApplicationExceptionHandler.handleCreditLimitExceededException");
-        return new ResponseEntity<>(new ErrorResponse(HttpStatus.EXPECTATION_FAILED.value(), ex.getMessage()),HttpStatus.EXPECTATION_FAILED);
+        log.error(ex.getMessage());
+        return new ResponseEntity<>(new ErrorResponse(HttpStatus.EXPECTATION_FAILED.value(), HttpStatus.EXPECTATION_FAILED.getReasonPhrase(),
+                ex.getMessage()),HttpStatus.EXPECTATION_FAILED);
     }
 
     /**
@@ -38,7 +40,9 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
     protected ResponseEntity<Object> handleDataNotFoundException(
             DataNotFoundException ex) {
         log.error("ApplicationExceptionHandler.handleDataNotFoundException");
-        return new ResponseEntity<>(new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage()),HttpStatus.NOT_FOUND);
+        log.error(ex.getMessage());
+        return new ResponseEntity<>(new ErrorResponse(HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND.getReasonPhrase(),
+                ex.getMessage()),HttpStatus.NOT_FOUND);
     }
 
 
@@ -51,7 +55,9 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
     protected ResponseEntity<Object> handleException(
             Exception ex) {
         log.error("ApplicationExceptionHandler.handleException");
-        return new ResponseEntity<>(new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
+        log.error(ex.getMessage());
+        return new ResponseEntity<>(new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                ex.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }

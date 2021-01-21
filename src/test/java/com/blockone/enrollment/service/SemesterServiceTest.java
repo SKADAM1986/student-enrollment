@@ -80,7 +80,7 @@ class SemesterServiceTest {
     @Test
     void testGetSemesterDetails_Positive()
     {
-        when(semesterRepository.findBySemId(any(Long.class))).thenReturn(sem1e);
+        when(semesterRepository.findBySemesterId(any(Long.class))).thenReturn(sem1e);
         when(objectMapper.convertToModel(sem1e)).thenReturn(sem1);
 
         Assertions.assertEquals(sem1, semesterService.getSemesterDetails(new Long(1)));
@@ -89,7 +89,7 @@ class SemesterServiceTest {
     @Test
     void testGetSemesterDetails_Negative()
     {
-        when(semesterRepository.findBySemId(any(Long.class))).thenReturn(null);
+        when(semesterRepository.findBySemesterId(any(Long.class))).thenReturn(null);
         //when(objectMapper.convertToModel(sem1e)).thenReturn(sem1);
 
         Assertions.assertNull(semesterService.getSemesterDetails(new Long(1)));

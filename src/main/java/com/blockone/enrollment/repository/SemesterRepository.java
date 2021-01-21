@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SemesterRepository extends CrudRepository<Semester, Long> {
-    Semester findBySemId(Long semId);
+    Semester findBySemesterId(Long semesterId);
 }
 

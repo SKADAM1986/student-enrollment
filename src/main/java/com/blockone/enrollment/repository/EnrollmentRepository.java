@@ -13,8 +13,8 @@ import java.util.List;
 public interface EnrollmentRepository extends CrudRepository<Enrollment, EnrollmentId> {
 
     String SUM_CREDITS_QUERY = "SELECT IFNULL(sum(c.credits), 0) from enrollment e, class_info c, semester s " +
-            "where e.class_name = c.class_name and e.semester_id = s.sem_id " +
-            "and e.student_id = ?1 and s.sem_id =  ?2 and e.active_indicator = 1";
+            "where e.class_name = c.class_name and e.semester_id = s.semester_id " +
+            "and e.student_id = ?1 and s.semester_id =  ?2 and e.active_indicator = 1";
 
     String ENROLLMENT_DATE_QUERY = "SELECT e.enrollment_date from enrollment e " +
             "where e.student_id = ?1 and e.semester_id = ?2 and e.class_name = ?3";
@@ -23,35 +23,26 @@ public interface EnrollmentRepository extends CrudRepository<Enrollment, Enrollm
             "e.student_id = ?1 and e.semester_id = ?2 and e.class_name = ?3";
 
     @Query(value = SUM_CREDITS_QUERY, nativeQuery = true)
-    Long sumCreditPointsForStudent(Long studentId, Long semId);
+    Long sumCreditPointsForStudent(Long studentId, Long SemesterId);
 
     @Query(value = ENROLLMENT_DATE_QUERY, nativeQuery = true)
-    LocalDate getEnrollmentDate(Long studentId, Long semId, String classType);
+    LocalDate getEnrollmentDate(Long studentId, Long SemesterId, String classType);
 
     @Modifying
     @Query(value = UPDATE_ENROLLMENT_QUERY, nativeQuery = true)
-    int updateActiveIndicator(Long studentId, Long semId, String className, int active);
+    int updateActiveIndicator(Long studentId, Long SemesterId, String className, int active);
 
     Enrollment findByEnrollmentId(EnrollmentId enrollmentId);
 
-    List<Enrollment> findAllByEnrollmentId_SemesterSemIdAndEnrollmentId_ClassType_ClassNameAndActiveIndicatorIsTrue(Long semId, String className);
+    List<Enrollment> findAllByEnrollmentId_SemesterSemesterIdAndEnrollmentId_ClassType_ClassNameAndActiveIndicatorIsTrue(Long SemesterId, String className);
 
-    List<Enrollment> findAllByEnrollmentId_SemesterSemIdAndActiveIndicatorIsTrueAndEnrollmentId_StudentStudentIdAndActiveIndicatorIsTrue(Long semId, Long studentId);
+    List<Enrollment> findAllByEnrollmentId_SemesterSemesterIdAndActiveIndicatorIsTrueAndEnrollmentId_StudentStudentIdAndActiveIndicatorIsTrue(Long SemesterId, Long studentId);
 
     List<Enrollment> findAllByEnrollmentId_StudentStudentIdAndActiveIndicatorIsTrue(Long studentId);
 
-    List<Enrollment> findAllByEnrollmentId_SemesterSemIdAndActiveIndicatorIsTrue(Long semId);
+    List<Enrollment> findAllByEnrollmentId_SemesterSemesterIdAndActiveIndicatorIsTrue(Long SemesterId);
 
     List<Enrollment> findAllByEnrollmentId_ClassType_ClassNameAndActiveIndicatorIsTrue(String className);
-
-
-    List<Enrollment> findAllByEnrollmentId_SemesterSemId(Long semesterId);
-
-    List<Enrollment> findAllByEnrollmentId_ClassType_ClassName(String className);
-
-
-
-
 
 }
 

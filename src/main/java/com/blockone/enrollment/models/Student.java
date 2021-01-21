@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @ToString
 @EqualsAndHashCode
-public class Student  implements Serializable {
+public class Student implements Serializable {
     private Long studentId;
 
     private String firstName;

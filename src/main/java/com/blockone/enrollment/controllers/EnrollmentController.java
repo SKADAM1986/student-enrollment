@@ -34,14 +34,14 @@ public class EnrollmentController {
      */
     @PostMapping(path="/enroll")
     public ResponseEntity<EnrollmentResponse> createNewStudentEnrollment(@RequestBody Enrollment enrollment) {
-        log.info("StudentsController - Enroll Student");
+        log.info("EnrollmentController - createNewStudentEnrollment");
         //Call Service to Create new Enrollment
         Enrollment e = enrollmentService.saveEnrollment(enrollment);
 
         //Enrollment Obj saved in DB, send StudentId, SemesterId and ClassName to client
         return new ResponseEntity<EnrollmentResponse>(new EnrollmentResponse(
                 e.getStudent().getStudentId(),
-                e.getSemester().getSemId(),
+                e.getSemester().getSemesterId(),
                 e.getClassType().getClassName(),
                 "Student's Enrollment Record Created. Use Get Request to get Enrollment Details"), HttpStatus.CREATED);
     }
@@ -55,13 +55,13 @@ public class EnrollmentController {
      */
     @PutMapping(path="/enroll")
     public ResponseEntity<EnrollmentResponse> enableStudentsEnrollment(@RequestBody Enrollment enrollment){
-        log.info("StudentsController - Enroll Student");
+        log.info("EnrollmentController - enableStudentsEnrollment");
 
         Enrollment e = enrollmentService.saveEnrollment(enrollment);
         //Enrollment Obj saved in DB, send Student id to client
         return new ResponseEntity<EnrollmentResponse>(new EnrollmentResponse(
                 e.getStudent().getStudentId(),
-                e.getSemester().getSemId(),
+                e.getSemester().getSemesterId(),
                 e.getClassType().getClassName(),
                 "Student's Enrollment is Modified/Enrolled. Use Get Request to get Enrollment Details"), HttpStatus.CREATED);
     }
@@ -74,12 +74,12 @@ public class EnrollmentController {
      */
     @PutMapping(path="/withdraw")
     public ResponseEntity<EnrollmentResponse> withdrawStudentsEnrollment(@RequestBody Enrollment enrollment) {
-        log.info("StudentsController - Withdraw Student's Enrollment");
+        log.info("EnrollmentController - Withdraw Student's Enrollment");
         enrollmentService.withdrawEnrollment(enrollment);
         //Enrollment Obj saved in DB, send Student id to client
         return new ResponseEntity<EnrollmentResponse>(new EnrollmentResponse(
                 enrollment.getStudent().getStudentId(),
-                enrollment.getSemester().getSemId(),
+                enrollment.getSemester().getSemesterId(),
                 enrollment.getClassType().getClassName(),
                 "Student's Enrollment is withdrawn. Use Get Request to get Enrollment Details"), HttpStatus.OK);
     }

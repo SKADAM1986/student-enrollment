@@ -54,12 +54,12 @@ public class EnrollmentService {
     public Enrollment saveEnrollment(Enrollment enrollmentModel) {
         log.info("EnrollmentService.saveEnrollment()");
         log.info("Get Total Credit for all Enrolled Classes [{}]", enrollmentModel.getEnrollmentId());
-        log.info("Student Id -[{}]Sem Id - {}", enrollmentModel.getStudent().getStudentId(), enrollmentModel.getSemester().getSemId());
+        log.info("Student Id -[{}]Sem Id - {}", enrollmentModel.getStudent().getStudentId(), enrollmentModel.getSemester().getSemesterId());
 
         //Before Saving Enrollment, get sum of Credits for all enrolled classes for this semester
         Long totalCredits = enrollmentRepository.sumCreditPointsForStudent(
                 enrollmentModel.getStudent().getStudentId()
-                , enrollmentModel.getSemester().getSemId());
+                , enrollmentModel.getSemester().getSemesterId());
         log.info("Enrolled Classes total Credit ->[{}]", totalCredits);
 
         //Get Credit points for current requested class.
@@ -83,7 +83,7 @@ public class EnrollmentService {
             //If Enrollment does not exist, just update active indicator to false
             if(e != null) {
                 int returnVal = enrollmentRepository.updateActiveIndicator(e.getEnrollmentId().getStudent().getStudentId(),
-                        e.getEnrollmentId().getSemester().getSemId(),
+                        e.getEnrollmentId().getSemester().getSemesterId(),
                         e.getEnrollmentId().getClassType().getClassName(), 1);
                 log.info("Return Value After Update Query - [{}]" , returnVal);
             } else {
@@ -114,7 +114,7 @@ public class EnrollmentService {
         //Set active_indicator to 0 in enrollments table for this Student, semester and class
         int returnVal = enrollmentRepository.updateActiveIndicator(
                 enrollmentEntity.getEnrollmentId().getStudent().getStudentId(),
-                enrollmentEntity.getEnrollmentId().getSemester().getSemId(),
+                enrollmentEntity.getEnrollmentId().getSemester().getSemesterId(),
                 enrollmentEntity.getEnrollmentId().getClassType().getClassName(), 0
                 );
         log.info("Return Value After Update Query - [{}]",returnVal);
@@ -135,7 +135,7 @@ public class EnrollmentService {
         //Fetch Semester Details based on Semester id
         enrollmentEntity.getEnrollmentId().setSemester(
                 objectMapper.convertToEntity(
-                        semesterService.getSemesterDetails(enrollmentEntity.getEnrollmentId().getSemester().getSemId())));
+                        semesterService.getSemesterDetails(enrollmentEntity.getEnrollmentId().getSemester().getSemesterId())));
         //As of now Student and Class information not needed
     }
 
@@ -186,16 +186,15 @@ public class EnrollmentService {
         //We need to fetch only Active enrollments
         if(className != null && semesterId != null) {
             log.info("className and  SemesterId not null. Fetching records from DB");
-            enrollments = enrollmentRepository.findAllByEnrollmentId_SemesterSemIdAndEnrollmentId_ClassType_ClassNameAndActiveIndicatorIsTrue(
+            enrollments = enrollmentRepository.findAllByEnrollmentId_SemesterSemesterIdAndEnrollmentId_ClassType_ClassNameAndActiveIndicatorIsTrue(
                     semesterId, className);
         } else if(className == null && semesterId != null) {
             log.info("className is null and semesterId is not null. Fetching records from DB");
-            enrollments = enrollmentRepository.findAllByEnrollmentId_SemesterSemIdAndActiveIndicatorIsTrue(semesterId);
+            enrollments = enrollmentRepository.findAllByEnrollmentId_SemesterSemesterIdAndActiveIndicatorIsTrue(semesterId);
         } else {
             log.info("className is not null. Fetching records from DB");
             enrollments = enrollmentRepository.findAllByEnrollmentId_ClassType_ClassNameAndActiveIndicatorIsTrue(className);
         }
-        enrollments.forEach(e -> log.info("Enrollment -> " +e));
         //Once Data retrieved, map to Enrollment Model Object to further processing
         return enrollments.stream().map( obj -> objectMapper.convertToModel(obj) ).collect(Collectors.toList());
     }

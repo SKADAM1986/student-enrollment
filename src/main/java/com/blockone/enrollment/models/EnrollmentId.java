@@ -12,7 +12,7 @@ import java.io.Serializable;
 public class EnrollmentId implements Serializable, Comparable<EnrollmentId> {
 
     private Long studentId;
-    private Long semId;
+    private Long semesterId;
     private String className;
 
     @Override
@@ -21,7 +21,7 @@ public class EnrollmentId implements Serializable, Comparable<EnrollmentId> {
         int i = this.getStudentId().compareTo(o.getStudentId());
         if (i != 0) return i;
 
-        i = this.getSemId().compareTo(o.getSemId());
+        i = this.getSemesterId().compareTo(o.getSemesterId());
         if (i != 0) return i;
 
         i = this.getClassName().compareTo(o.getClassName());

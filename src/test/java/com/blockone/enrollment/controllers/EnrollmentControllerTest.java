@@ -29,32 +29,30 @@ class EnrollmentControllerTest {
     @Mock
     EnrollmentService enrollmentService;
 
-    Enrollment e;
+    Enrollment enrollment;
 
     @BeforeEach
     public void initializeEnrollment() {
         Student s = new Student(new Long(1), "George", "Rizzi", LocalDate.now(), LocalDate.now(), "11111111", "USA" );
         Semester sem = new Semester(new Long(1), "Winter-2020", null, null);
         ClassType c = new ClassType("2A", 4);
-        e = new Enrollment(s,sem, c, LocalDate.now(), LocalDate.now(), true);
+        enrollment = new Enrollment();
+        s.setStudentId(new Long(1));
+        enrollment.setStudent(s);
+        sem.setSemesterId(new Long(1));
+        enrollment.setSemester(sem);
+        c.setClassName("2A");
+        enrollment.setClassType(c);
     }
 
     @Test
     void testCreateEnrollment_Positive()
     {
-        when(enrollmentService.saveEnrollment(any(Enrollment.class))).thenReturn(e);
-        Enrollment enrollment = new Enrollment();
-        Student s = new Student();
-        s.setStudentId(new Long(1));
-        enrollment.setStudent(s);
-        Semester sem = new Semester();
-        sem.setSemId(new Long(1));
-        enrollment.setSemester(sem);
-        ClassType c = new ClassType();
-        c.setClassName("2A");
-        enrollment.setClassType(c);
+        when(enrollmentService.saveEnrollment(any(Enrollment.class))).thenReturn(enrollment);
+
         ResponseEntity<EnrollmentResponse> responseEntity = enrollmentController.createNewStudentEnrollment(enrollment);
-        Assertions.assertEquals(sem.getSemId(), responseEntity.getBody().getSemesterId());
+
+        Assertions.assertEquals(enrollment.getSemester().getSemesterId(), responseEntity.getBody().getSemesterId());
         Assertions.assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
     }
 
@@ -62,35 +60,18 @@ class EnrollmentControllerTest {
     void testCreateEnrollment_Exception()
     {
         when(enrollmentService.saveEnrollment(Mockito.any(Enrollment.class))).thenThrow(CreditLimitExceededException.class);
-        Enrollment enrollment = new Enrollment();
-        Student s = new Student();
-        s.setStudentId(new Long(1));
-        enrollment.setStudent(s);
-        Semester sem = new Semester();
-        sem.setSemId(new Long(1));
-        enrollment.setSemester(sem);
-        ClassType c = new ClassType();
-        c.setClassName("2A");
-        enrollment.setClassType(c);
+
         Assertions.assertThrows(CreditLimitExceededException.class,() -> enrollmentController.createNewStudentEnrollment(enrollment));
     }
 
     @Test
     void testEnableStudentsEnrollment_Positive()
     {
-        when(enrollmentService.saveEnrollment(any(Enrollment.class))).thenReturn(e);
-        Enrollment enrollment = new Enrollment();
-        Student s = new Student();
-        s.setStudentId(new Long(1));
-        enrollment.setStudent(s);
-        Semester sem = new Semester();
-        sem.setSemId(new Long(1));
-        enrollment.setSemester(sem);
-        ClassType c = new ClassType();
-        c.setClassName("2A");
-        enrollment.setClassType(c);
+        when(enrollmentService.saveEnrollment(any(Enrollment.class))).thenReturn(enrollment);
         ResponseEntity<EnrollmentResponse> responseEntity = enrollmentController.enableStudentsEnrollment(enrollment);
-        Assertions.assertEquals(sem.getSemId(), responseEntity.getBody().getSemesterId());
+        Assertions.assertEquals(enrollment.getSemester().getSemesterId(), responseEntity.getBody().getSemesterId());
+        Assertions.assertEquals(enrollment.getStudent().getStudentId(), responseEntity.getBody().getStudentId());
+        Assertions.assertEquals(enrollment.getClassType().getClassName(), responseEntity.getBody().getClassName());
         Assertions.assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
     }
 
@@ -98,16 +79,7 @@ class EnrollmentControllerTest {
     void testEnableStudentsEnrollment_Exception()
     {
         when(enrollmentService.saveEnrollment(Mockito.any(Enrollment.class))).thenThrow(CreditLimitExceededException.class);
-        Enrollment enrollment = new Enrollment();
-        Student s = new Student();
-        s.setStudentId(new Long(1));
-        enrollment.setStudent(s);
-        Semester sem = new Semester();
-        sem.setSemId(new Long(1));
-        enrollment.setSemester(sem);
-        ClassType c = new ClassType();
-        c.setClassName("2A");
-        enrollment.setClassType(c);
+
         Assertions.assertThrows(CreditLimitExceededException.class,() -> enrollmentController.enableStudentsEnrollment(enrollment));
     }
 
@@ -115,18 +87,12 @@ class EnrollmentControllerTest {
     void testWithdrawStudentsEnrollment_Positive()
     {
         doNothing().when(enrollmentService).withdrawEnrollment(any(Enrollment.class));
-        Enrollment enrollment = new Enrollment();
-        Student s = new Student();
-        s.setStudentId(new Long(1));
-        enrollment.setStudent(s);
-        Semester sem = new Semester();
-        sem.setSemId(new Long(1));
-        enrollment.setSemester(sem);
-        ClassType c = new ClassType();
-        c.setClassName("2A");
-        enrollment.setClassType(c);
+
         ResponseEntity<EnrollmentResponse> responseEntity = enrollmentController.withdrawStudentsEnrollment(enrollment);
-        Assertions.assertEquals(sem.getSemId(), responseEntity.getBody().getSemesterId());
+
+        Assertions.assertEquals(enrollment.getSemester().getSemesterId(), responseEntity.getBody().getSemesterId());
+        Assertions.assertEquals(enrollment.getStudent().getStudentId(), responseEntity.getBody().getStudentId());
+        Assertions.assertEquals(enrollment.getClassType().getClassName(), responseEntity.getBody().getClassName());
         Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     }
 
@@ -134,16 +100,7 @@ class EnrollmentControllerTest {
     void testWithdrawStudentsEnrollment_Exception()
     {
         doThrow(new DataNotFoundException()).when(enrollmentService).withdrawEnrollment(any(Enrollment.class));
-        Enrollment enrollment = new Enrollment();
-        Student s = new Student();
-        s.setStudentId(new Long(1));
-        enrollment.setStudent(s);
-        Semester sem = new Semester();
-        sem.setSemId(new Long(1));
-        enrollment.setSemester(sem);
-        ClassType c = new ClassType();
-        c.setClassName("2A");
-        enrollment.setClassType(c);
+
         Assertions.assertThrows(DataNotFoundException.class,() -> enrollmentController.withdrawStudentsEnrollment(enrollment));
     }
 

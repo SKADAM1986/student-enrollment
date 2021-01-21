@@ -3,6 +3,7 @@ package com.blockone.enrollment.models;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 @Getter
@@ -11,11 +12,11 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @ToString
 @EqualsAndHashCode
-public class Semester {
+public class Semester implements Serializable {
 
-    private Long semId;
+    private Long semesterId;
 
-    private String semName;
+    private String semesterName;
 
     @JsonFormat(pattern="MM/dd/yyyy")
     private LocalDate startDate;

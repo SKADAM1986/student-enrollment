@@ -1,11 +1,10 @@
 package com.blockone.enrollment.entity;
 
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -16,18 +15,16 @@ import java.util.Date;
 @Table(name="semester")
 public class Semester implements Serializable {
 
-    @Id @GeneratedValue @Column(name="sem_id")
-    private Long semId;
+    @Id @GeneratedValue @Column(name="semester_id")
+    private Long semesterId;
 
-    @Column(name="sem_name")
-    private String semName;
+    @Column(name="semester_name")
+    private String semesterName;
 
     @Column(name="start_date")
-    @DateTimeFormat(pattern="MM/dd/yyyy")
-    private Date startDate;
+    private LocalDate startDate;
 
     @Column(name="end_date")
-    @DateTimeFormat(pattern="MM/dd/yyyy")
-    private Date endDate;
+    private LocalDate endDate;
 
 }

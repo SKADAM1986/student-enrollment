@@ -1,13 +1,12 @@
 package com.blockone.enrollment.service;
 
 import com.blockone.enrollment.entity.EnrollmentId;
-import com.blockone.enrollment.exceptions.CreditLimitExceededException;
-import com.blockone.enrollment.exceptions.DataNotFoundException;
 import com.blockone.enrollment.models.ClassType;
 import com.blockone.enrollment.models.Enrollment;
 import com.blockone.enrollment.models.Semester;
 import com.blockone.enrollment.models.Student;
 import com.blockone.enrollment.repository.ClassRepository;
+import com.blockone.enrollment.repository.EnrollmentPageableRepository;
 import com.blockone.enrollment.repository.EnrollmentRepository;
 import com.blockone.enrollment.util.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
@@ -19,13 +18,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.mockito.Mockito.any;
@@ -44,6 +46,9 @@ class ClassServiceTest {
 
     @Mock
     EnrollmentRepository enrollmentRepository;
+
+    @Mock
+    EnrollmentPageableRepository enrollmentPageableRepository;
 
     @Autowired
     @Mock
@@ -116,16 +121,17 @@ class ClassServiceTest {
     @Test
     void testGetClassesBySemesterStudent_Positive_BothPresent()
     {
-        when(enrollmentRepository.findAllByEnrollmentId_SemesterSemIdAndActiveIndicatorIsTrueAndEnrollmentId_StudentStudentIdAndActiveIndicatorIsTrue(any(Long.class), any(Long.class))).thenReturn(enrollmentEntityList);
+        when(enrollmentRepository.findAllByEnrollmentId_SemesterSemesterIdAndActiveIndicatorIsTrueAndEnrollmentId_StudentStudentIdAndActiveIndicatorIsTrue(any(Long.class), any(Long.class))).thenReturn(enrollmentEntityList);
         when(objectMapper.convertToModel(class1e)).thenReturn(class1);
         when(objectMapper.convertToModel(class2e)).thenReturn(class2);
 
         List<ClassType> newClassList = classService.getClassesBySemesterStudent(new Long(1), new Long(1));
 
-        classModelList.sort(Comparator.comparing(ClassType::getClassName));
+        List<ClassType> classes = classModelList.stream().distinct().collect(Collectors.toList());
+        classes.sort(Comparator.comparing(ClassType::getClassName));
         newClassList.sort(Comparator.comparing(ClassType::getClassName));
 
-        assertIterableEquals(classModelList,newClassList);
+        assertIterableEquals(classes,newClassList);
     }
 
     @Test
@@ -137,57 +143,60 @@ class ClassServiceTest {
 
         List<ClassType> newClassList = classService.getClassesBySemesterStudent(null, new Long(1));
 
-        classModelList.sort(Comparator.comparing(ClassType::getClassName));
+        List<ClassType> classes = classModelList.stream().distinct().collect(Collectors.toList());
+        classes.sort(Comparator.comparing(ClassType::getClassName));
         newClassList.sort(Comparator.comparing(ClassType::getClassName));
 
-        assertIterableEquals(classModelList,newClassList);
+        assertIterableEquals(classes,newClassList);
     }
 
     @Test
     void testGetClassesBySemesterStudent_Positive_SemesterId()
     {
-        when(enrollmentRepository.findAllByEnrollmentId_SemesterSemIdAndActiveIndicatorIsTrue(any(Long.class))).thenReturn(enrollmentEntityList);
+        when(enrollmentRepository.findAllByEnrollmentId_SemesterSemesterIdAndActiveIndicatorIsTrue(any(Long.class))).thenReturn(enrollmentEntityList);
         when(objectMapper.convertToModel(class1e)).thenReturn(class1);
         when(objectMapper.convertToModel(class2e)).thenReturn(class2);
 
         List<ClassType> newClassList = classService.getClassesBySemesterStudent(new Long(1), null);
 
-        classModelList.sort(Comparator.comparing(ClassType::getClassName));
+        List<ClassType> classes = classModelList.stream().distinct().collect(Collectors.toList());
+        classes.sort(Comparator.comparing(ClassType::getClassName));
         newClassList.sort(Comparator.comparing(ClassType::getClassName));
 
-        assertIterableEquals(classModelList,newClassList);
-    }
-/*
-    @Test
-    void testGetAllEnrollmentsBySemester_Positive()
-    {
-        when(enrollmentRepository.findAllByEnrollmentId_SemesterSemIdAndActiveIndicatorIsTrue(any(Long.class))).thenReturn(enrollmentEntityList);
-        when(objectMapper.convertToModel(e1Entity)).thenReturn(e1Model);
-        when(objectMapper.convertToModel(e2Entity)).thenReturn(e2Model);
-
-        List<Enrollment> newEnrollmentList = enrollmentService.getAllEnrollmentsForSemester(new Long(1));
-
-        enrollmentModelList.sort(Comparator.comparing(Enrollment::getEnrollmentId));
-        newEnrollmentList.sort(Comparator.comparing(Enrollment::getEnrollmentId));
-
-        assertIterableEquals(enrollmentModelList,newEnrollmentList);
-
+        assertIterableEquals(classes,newClassList);
     }
 
     @Test
-    void testGetAllEnrollmentsByClassAndSemester_Positive()
+    void testGetAllClasses_Positive_All()
     {
-        when(enrollmentRepository.findAllByEnrollmentId_SemesterSemIdAndEnrollmentId_ClassType_ClassNameAndActiveIndicatorIsTrue(any(Long.class)
-                , any(String.class))).thenReturn(enrollmentEntityList);
-        when(objectMapper.convertToModel(e1Entity)).thenReturn(e1Model);
-        when(objectMapper.convertToModel(e2Entity)).thenReturn(e2Model);
+        when(enrollmentRepository.findAll()).thenReturn(enrollmentEntityList);
+        when(objectMapper.convertToModel(class1e)).thenReturn(class1);
+        when(objectMapper.convertToModel(class2e)).thenReturn(class2);
 
-        List<Enrollment> newEnrollmentList = enrollmentService.getAllEnrollmentsForClassInSemester("2A", new Long(1));
+        List<ClassType> newClassList = classService.getAllClasses(null, null);
 
-        enrollmentModelList.sort(Comparator.comparing(Enrollment::getEnrollmentId));
-        newEnrollmentList.sort(Comparator.comparing(Enrollment::getEnrollmentId));
+        List<ClassType> classes = classModelList.stream().distinct().collect(Collectors.toList());
+        classes.sort(Comparator.comparing(ClassType::getClassName));
+        newClassList.sort(Comparator.comparing(ClassType::getClassName));
 
-        assertIterableEquals(enrollmentModelList,newEnrollmentList);
+        assertIterableEquals(classes, newClassList);
+    }
 
-    }*/
+    @Test
+    void testGetAllClasses_Positive_Paging()
+    {
+        Page enrollmentPage = new PageImpl(enrollmentEntityList);
+        when(enrollmentPageableRepository.findAll(any(Pageable.class))).thenReturn(enrollmentPage);
+        when(objectMapper.convertToModel(class1e)).thenReturn(class1);
+        when(objectMapper.convertToModel(class2e)).thenReturn(class2);
+
+        List<ClassType> newClassList = classService.getAllClasses(new Long(0), new Long(2));
+
+        List<ClassType> classes = classModelList.stream().distinct().collect(Collectors.toList());
+        classes.sort(Comparator.comparing(ClassType::getClassName));
+        newClassList.sort(Comparator.comparing(ClassType::getClassName));
+
+        assertIterableEquals(classes,newClassList);
+    }
+
 }

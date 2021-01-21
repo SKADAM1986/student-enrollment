@@ -19,15 +19,16 @@ public class SemesterService {
     ObjectMapper objectMapper;
 
     public Semester createSemester(Semester semester){
-        log.info("Semester.createSemester() - [{}]", semester.getSemName());
+        log.info("Semester.createSemester() - [{}]", semester.getSemesterName());
         //Save Semester Details to DB
-        return objectMapper.convertToModel(semesterRepository.save(objectMapper.convertToEntity(semester)));
+        com.blockone.enrollment.entity.Semester s = semesterRepository.save(objectMapper.convertToEntity(semester));
+        return objectMapper.convertToModel(s);
     }
 
     @Cacheable("semester")
     public Semester getSemesterDetails(Long semId) {
         log.info("Semester.getSemesterDetails() - [{}]",semId);
-        com.blockone.enrollment.entity.Semester s = semesterRepository.findBySemId(semId);
+        com.blockone.enrollment.entity.Semester s = semesterRepository.findBySemesterId(semId);
         if(s != null) {
             log.info("Semester Object retrieved - [{}]", s);
             return objectMapper.convertToModel(s);

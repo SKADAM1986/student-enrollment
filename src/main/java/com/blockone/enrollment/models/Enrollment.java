@@ -2,6 +2,8 @@ package com.blockone.enrollment.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
+
+import java.io.Serializable;
 import java.time.LocalDate;
 
 @Getter
@@ -10,7 +12,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @ToString
 @EqualsAndHashCode
-public class Enrollment {
+public class Enrollment implements Serializable {
 
     private Student student;
     private Semester semester;
@@ -25,7 +27,7 @@ public class Enrollment {
     private boolean activeIndicator;
 
     public EnrollmentId getEnrollmentId() {
-        return new EnrollmentId(this.student.getStudentId(), this.semester.getSemId(), this.classType.getClassName());
+        return new EnrollmentId(this.student.getStudentId(), this.semester.getSemesterId(), this.classType.getClassName());
     }
 
 }

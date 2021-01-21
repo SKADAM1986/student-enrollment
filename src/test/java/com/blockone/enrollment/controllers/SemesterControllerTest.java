@@ -41,11 +41,11 @@ class SemesterControllerTest {
         Semester s1 = new Semester(new Long(1), "Winter-2020", LocalDate.now(), LocalDate.now());
         when(semesterService.createSemester(any(Semester.class))).thenReturn(s1);
         Semester sem = new Semester();
-        sem.setSemName("Winter-2020");
+        sem.setSemesterName("Winter-2020");
         sem.setStartDate(LocalDate.now());
         sem.setEndDate(LocalDate.now());
         ResponseEntity<SemesterResponse> responseEntity = semesterController.createSemester(sem);
-        Assertions.assertEquals(s1.getSemId(), responseEntity.getBody().getSemesterId());
+        Assertions.assertEquals(s1.getSemesterId(), responseEntity.getBody().getSemesterId());
         Assertions.assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
     }
 

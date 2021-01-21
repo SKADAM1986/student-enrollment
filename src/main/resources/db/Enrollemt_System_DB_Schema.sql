@@ -23,11 +23,11 @@ CREATE TABLE `hibernate_sequence` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `semester` (
-  `sem_id` bigint NOT NULL,
+  `semester_id` bigint NOT NULL,
   `end_date` datetime DEFAULT NULL,
   `sem_name` varchar(255) DEFAULT NULL,
   `start_date` datetime DEFAULT NULL,
-  PRIMARY KEY (`sem_id`)
+  PRIMARY KEY (`semester_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `students` (
