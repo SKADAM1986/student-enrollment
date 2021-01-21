@@ -49,28 +49,31 @@ public class EnrollmentService {
      * IF Re-enrollment request, it will update active indicator
      * @Param enrollmentModel
      * @return Enrollment
-     * @throws CreditLimitExceededException, NoRecordFoundException thrown from this method
      */
     @Transactional
-    public Enrollment saveEnrollment(Enrollment enrollmentModel) throws CreditLimitExceededException, DataNotFoundException {
+    public Enrollment saveEnrollment(Enrollment enrollmentModel) {
         log.info("EnrollmentService.saveEnrollment()");
-        log.info("Get Total Credit for all Enrolled Classes "+ enrollmentModel);
-        log.info("Student Id - {} Sem Id - {}", enrollmentModel.getStudent().getStudentId(), enrollmentModel.getSemester().getSemId());
+        log.info("Get Total Credit for all Enrolled Classes [{}]", enrollmentModel.getEnrollmentId());
+        log.info("Student Id -[{}]Sem Id - {}", enrollmentModel.getStudent().getStudentId(), enrollmentModel.getSemester().getSemId());
+
+        //Before Saving Enrollment, get sum of Credits for all enrolled classes for this semester
         Long totalCredits = enrollmentRepository.sumCreditPointsForStudent(
                 enrollmentModel.getStudent().getStudentId()
                 , enrollmentModel.getSemester().getSemId());
-        log.info("Enrolled Classes total Credit -> "+ totalCredits);
+        log.info("Enrolled Classes total Credit ->[{}]", totalCredits);
 
+        //Get Credit points for current requested class.
         ClassType c = classService.getClassType(enrollmentModel.getClassType().getClassName());
-        log.info("Requested Class has {} Credits", c.getCreditPoints());
 
+        log.info("Requested Class has[{}]Credits", c.getCreditPoints());
         if(totalCredits.intValue() + c.getCreditPoints() > Integer.valueOf(maxAllowedCredit)) {
-            log.error("Total Credit {} is more than limit. Throw CreditLimitExceededException", totalCredits);
-            String err = "Max Credit Limit per semester is {" + maxAllowedCredit + "}. You have already enrolled for {"
-                    + totalCredits + "} in this Semester. Class you are enrolling for has {" + c.getCreditPoints() + "} Credits. Please try to enroll to another semester.";
+            log.error("Total Credit[{}]is more than limit. Throw CreditLimitExceededException", totalCredits);
+            String err = "Max Credit Limit per semester is [{" + maxAllowedCredit + "}]. You have already enrolled for [{"
+                    + totalCredits + "}] in this Semester. Class you are enrolling for has [{" + c.getCreditPoints()
+                    + "}] Credits. Please try to enroll to another semester.";
             throw new CreditLimitExceededException(err);
         } else {
-            log.info("Total Credit {} is within limit. Proceed for Enrollment", totalCredits);
+            log.info("Total Credit [{}] is within limit. Proceed for Enrollment", totalCredits);
             com.blockone.enrollment.entity.Enrollment enrollmentEntity = objectMapper.convertToEntity(enrollmentModel);
             //Get Enrollment data from DB based on Student Id, Semester Id and Class Name
             com.blockone.enrollment.entity.Enrollment e = enrollmentRepository.findByEnrollmentId(
@@ -82,10 +85,7 @@ public class EnrollmentService {
                 int returnVal = enrollmentRepository.updateActiveIndicator(e.getEnrollmentId().getStudent().getStudentId(),
                         e.getEnrollmentId().getSemester().getSemId(),
                         e.getEnrollmentId().getClassType().getClassName(), 1);
-                log.info("Return Value After Update Query - "+returnVal);
-                if(returnVal == 0) {
-                    throw new DataNotFoundException("No Record found in Database. Please verify inputs");
-                }
+                log.info("Return Value After Update Query - [{}]" , returnVal);
             } else {
                 //Set Active Indicator to true when it is created
                 enrollmentEntity.setActiveIndicator(true);
@@ -104,24 +104,24 @@ public class EnrollmentService {
     /**
      * This method is used to Withdraw Enrollment, it just update ActiveIndicator value to false
      * @Param enrollmentModel
-     * @return Enrollment
      * @throws DataNotFoundException thrown from this method
      */
     @Transactional
-    public Enrollment withdrawEnrollment(Enrollment enrollmentModel) throws DataNotFoundException {
+    public void withdrawEnrollment(Enrollment enrollmentModel) {
         log.info("EnrollmentService.withdrawEnrollment()");
         com.blockone.enrollment.entity.Enrollment enrollmentEntity = objectMapper.convertToEntity(enrollmentModel);
         log.info("Calling enrollmentRepository.updateActiveIndicator(...)");
+        //Set active_indicator to 0 in enrollments table for this Student, semester and class
         int returnVal = enrollmentRepository.updateActiveIndicator(
                 enrollmentEntity.getEnrollmentId().getStudent().getStudentId(),
                 enrollmentEntity.getEnrollmentId().getSemester().getSemId(),
                 enrollmentEntity.getEnrollmentId().getClassType().getClassName(), 0
                 );
-        log.info("Return Value After Update Query - "+returnVal);
+        log.info("Return Value After Update Query - [{}]",returnVal);
+        //No data found based on requested criteria.
         if(returnVal == 0) {
             throw new DataNotFoundException("No Record found in Database. Please verify inputs");
         }
-        return enrollmentModel;
     }
 
     /**
@@ -136,28 +136,7 @@ public class EnrollmentService {
         enrollmentEntity.getEnrollmentId().setSemester(
                 objectMapper.convertToEntity(
                         semesterService.getSemesterDetails(enrollmentEntity.getEnrollmentId().getSemester().getSemId())));
-        //As of now, code is commented for Class Details and Student Information.
-        // But can be used if need to send data to client
-        /*Fetch Class Details based on Class Name
-        enrollmentEntity.getEnrollmentId().setClassType(
-                objectMapper.convertToEntity(
-                        classService.getClassType(enrollmentEntity.getEnrollmentId().getClassType().getClassName())));
-
-        //Fetch Student Details based on Student id
-        enrollmentEntity.getEnrollmentId().setStudent(
-                objectMapper.convertToEntity(
-                        studentService.getStudentDetails(enrollmentEntity.getEnrollmentId().getStudent().getStudentId())));
-
-        //Populate enrollment date from DB if student requested for withdrawal
-        if(enrollmentEntity.getEnrollmentDate() == null) {
-            log.info("enrollmentEntity.getEnrollmentDate() is null, fetching from database");
-            enrollmentEntity.setEnrollmentDate(enrollmentRepository.getEnrollmentDate(
-                    enrollmentEntity.getEnrollmentId().getStudent().getStudentId(),
-                    enrollmentEntity.getEnrollmentId().getSemester().getSemId(),
-                    enrollmentEntity.getEnrollmentId().getClassType().getClassName()
-            ));
-            log.info("about to finish enrollmentEntity.getEnrollmentDate() -> " + enrollmentEntity.getEnrollmentDate());
-        }*/
+        //As of now Student and Class information not needed
     }
 
     /**
@@ -166,7 +145,8 @@ public class EnrollmentService {
      * @return List<Enrollment>
      */
     public List<Enrollment> getAllEnrollmentsByClass(String className) {
-        log.info("Fetch student by class - {} ", className );
+        log.info("Fetch student by class -[{}]", className );
+        //Call Generic method with null sem id
         return getAllEnrollments(className, null);
     }
     /**
@@ -175,7 +155,8 @@ public class EnrollmentService {
      * @return List<Enrollment>
      */
     public List<Enrollment> getAllEnrollmentsForSemester(Long semesterId) {
-        log.info("EnrollmentService.getAllStudentsEnrolledForSemester() START");
+        log.info("EnrollmentService.getAllStudentsEnrolledForSemester - [{}]",semesterId);
+        //Call Generic method with null class name
         return getAllEnrollments(null, semesterId);
     }
     /**
@@ -184,9 +165,10 @@ public class EnrollmentService {
      * @Param semId
      * @return List<Enrollment>
      */
-    public List<Enrollment> getAllEnrollmentsForClassInSemester(String className,Long semId) {
-        log.info("EnrollmentService.getAllStudentsEnrolledForClassInSemester() START");
-        return getAllEnrollments(className, semId);
+    public List<Enrollment> getAllEnrollmentsForClassInSemester(String className,Long semesterId) {
+        log.info("EnrollmentService.getAllStudentsEnrolledForClassInSemester - SemesterId [{}] , className [{}]",semesterId, className);
+        //Both values are present
+        return getAllEnrollments(className, semesterId);
     }
 
     /**
@@ -196,7 +178,7 @@ public class EnrollmentService {
      * @return List<Enrollment>
      */
     public List<Enrollment> getAllEnrollments(String className, Long semesterId){
-        log.info("EnrollmentService.getAllEnrollments() START");
+        log.info("EnrollmentService.getAllEnrollments");
         List<com.blockone.enrollment.entity.Enrollment> enrollments;
         //Check which parameter is received,
         //if className AND semesterId Received, Call based on AND condition
@@ -207,15 +189,13 @@ public class EnrollmentService {
             enrollments = enrollmentRepository.findAllByEnrollmentId_SemesterSemIdAndEnrollmentId_ClassType_ClassNameAndActiveIndicatorIsTrue(
                     semesterId, className);
         } else if(className == null && semesterId != null) {
-            log.info("semesterId is not null. Fetching records from DB");
+            log.info("className is null and semesterId is not null. Fetching records from DB");
             enrollments = enrollmentRepository.findAllByEnrollmentId_SemesterSemIdAndActiveIndicatorIsTrue(semesterId);
-        } else if(semesterId == null && className != null) {
+        } else {
             log.info("className is not null. Fetching records from DB");
             enrollments = enrollmentRepository.findAllByEnrollmentId_ClassType_ClassNameAndActiveIndicatorIsTrue(className);
-        } else {
-            throw new DataNotFoundException("No Record found in Database. Please verify inputs");
         }
-
+        enrollments.forEach(e -> log.info("Enrollment -> " +e));
         //Once Data retrieved, map to Enrollment Model Object to further processing
         return enrollments.stream().map( obj -> objectMapper.convertToModel(obj) ).collect(Collectors.toList());
     }

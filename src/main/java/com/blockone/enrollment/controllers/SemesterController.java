@@ -29,13 +29,13 @@ public class SemesterController {
      * @return ResponseEntity<Semester>
      */
     @PostMapping(path="/semesters")
-    public ResponseEntity<Semester> createSemester(@RequestBody Semester semester) {
-        log.info("SemesterController.createSemester() START");
+    public ResponseEntity<SemesterResponse> createSemester(@RequestBody Semester semester) {
+        log.info("SemesterController.createSemester()");
         //Call service to create Semester and return updated Semester info
         //insert data in semester table
         Semester s = semesterService.createSemester(semester);
         //Semester Obj saved in DB, send Semester id to client
-        return new ResponseEntity(new SemesterResponse(s.getSemId(),
+        return new ResponseEntity<SemesterResponse>(new SemesterResponse(s.getSemId(),
                 "New Semester is Created. Use Get Request to get Semester Details"), HttpStatus.CREATED);
     }
 

@@ -33,4 +33,5 @@ public class Enrollment  implements Serializable {
     @Column(name="active_indicator")
     private boolean activeIndicator;
 
+
 }

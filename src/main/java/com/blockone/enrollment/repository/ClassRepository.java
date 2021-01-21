@@ -5,7 +5,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ClassRepository extends CrudRepository<com.blockone.enrollment.entity.ClassType, String> {
+public interface ClassRepository extends CrudRepository<ClassType, String> {
 
     ClassType findByClassName(String className);
 

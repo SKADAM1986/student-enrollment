@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class StudentService {
-    private final Logger log = LoggerFactory.getLogger(ClassService.class);
+    private final Logger log = LoggerFactory.getLogger(StudentService.class);
     @Autowired
     StudentRepository studentRepository;
 
@@ -30,7 +30,7 @@ public class StudentService {
      * @return Student
      */
     public Student saveStudent(Student student) {
-        log.info("StudentService.saveStudent - {}",student.getStudentId());
+        log.info("StudentService.saveStudent - [{}]",student.getStudentId());
         return objectMapper.convertToModel(studentRepository.save(objectMapper.convertToEntity(student)));
     }
 
@@ -40,7 +40,7 @@ public class StudentService {
      * @return Student
      */
     public Student getStudentById(Long studentId) {
-        log.info("StudentService.getStudentById - {}",studentId);
+        log.info("StudentService.getStudentById - [{}]",studentId);
         com.blockone.enrollment.entity.Student student = studentRepository.findById(studentId).
                 orElseThrow(DataNotFoundException::new);
         return objectMapper.convertToModel(student);
@@ -53,7 +53,7 @@ public class StudentService {
      * @return List<Student>
      */
     public List<Student> getAllStudentsByClass(String className) {
-        log.info("StudentServiceFetch.getAllStudentsByClass - {} ", className );
+        log.info("StudentServiceFetch.getAllStudentsByClass -[{}]", className );
         return enrollmentService.getAllEnrollmentsByClass(className).stream().map(
                 Enrollment::getStudent).collect(Collectors.toList());
     }
@@ -65,7 +65,7 @@ public class StudentService {
      * @return List<Student>
      */
     public List<Student> getAllStudentsForSemester(Long semesterId) {
-        log.info("StudentService.getAllStudentsByClass - {} ", semesterId);
+        log.info("StudentService.getAllStudentsByClass -[{}]", semesterId);
         return enrollmentService.getAllEnrollmentsForSemester(semesterId).stream().map(
                 Enrollment::getStudent).collect(Collectors.toList());
     }
@@ -78,7 +78,7 @@ public class StudentService {
      * @return List<Student>
      */
     public List<Student> getAllStudentsForClassInSemester(String className,Long semId) {
-        log.info("StudentService.getAllStudentsForClassInSemester - className - {}, semesterId - {} ", className, semId);
+        log.info("StudentService.getAllStudentsForClassInSemester - className - [{}], semesterId -[{}]", className, semId);
         return enrollmentService.getAllEnrollmentsForClassInSemester(className, semId).stream().map(
                 Enrollment::getStudent).collect(Collectors.toList());
     }

@@ -19,9 +19,9 @@ import java.util.List;
 @RestController
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class StudentsController {
+public class StudentController {
 
-    private final Logger log = LoggerFactory.getLogger(StudentsController.class);
+    private final Logger log = LoggerFactory.getLogger(StudentController.class);
 
     @Autowired
     StudentService studentService;
@@ -40,7 +40,7 @@ public class StudentsController {
         //Call service to create Student and return updated Student info
         student.setCreateDate(LocalDate.now());
         //Student Obj saved in DB, send Student id to client
-        return new ResponseEntity(new StudentResponse(studentService.saveStudent(student).getStudentId(),
+        return new ResponseEntity<StudentResponse>(new StudentResponse(studentService.saveStudent(student).getStudentId(),
                 "Student Record Created. Use Get Request to get Student Details"), HttpStatus.CREATED);
     }
 
@@ -56,7 +56,7 @@ public class StudentsController {
         //Call service to modify Student and return updated Student info
         student.setStudentId(studentId);
         //Student Obj saved in DB, send Student id to client
-        return new ResponseEntity(new StudentResponse(studentService.saveStudent(student).getStudentId(),
+        return new ResponseEntity<StudentResponse>(new StudentResponse(studentService.saveStudent(student).getStudentId(),
                 "Student Record Updated. Use Get Request to get Student Details"), HttpStatus.OK);
     }
 

@@ -5,7 +5,6 @@ import com.blockone.enrollment.exceptions.DataNotFoundException;
 import com.blockone.enrollment.models.Enrollment;
 import com.blockone.enrollment.models.EnrollmentResponse;
 import com.blockone.enrollment.service.EnrollmentService;
-import com.blockone.enrollment.service.StudentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +24,6 @@ public class EnrollmentController {
     private final Logger log = LoggerFactory.getLogger(EnrollmentController.class);
 
     @Autowired
-    StudentService studentService;
-
-    @Autowired
     EnrollmentService enrollmentService;
 
     /**
@@ -35,16 +31,15 @@ public class EnrollmentController {
      * withdraw Enrollment for Semester and Class
      * @Param enrollment
      * @return ResponseEntity<EnrollmentResponse>
-     * @throws CreditLimitExceededException is thrown from Method
      */
     @PostMapping(path="/enroll")
-    public ResponseEntity<EnrollmentResponse> createNewStudentEnrollment(@RequestBody Enrollment enrollment) throws CreditLimitExceededException{
+    public ResponseEntity<EnrollmentResponse> createNewStudentEnrollment(@RequestBody Enrollment enrollment) {
         log.info("StudentsController - Enroll Student");
         //Call Service to Create new Enrollment
         Enrollment e = enrollmentService.saveEnrollment(enrollment);
 
         //Enrollment Obj saved in DB, send StudentId, SemesterId and ClassName to client
-        return new ResponseEntity(new EnrollmentResponse(
+        return new ResponseEntity<EnrollmentResponse>(new EnrollmentResponse(
                 e.getStudent().getStudentId(),
                 e.getSemester().getSemId(),
                 e.getClassType().getClassName(),
@@ -56,15 +51,15 @@ public class EnrollmentController {
      * withdraw Enrollment for Semester and Class
      * @Param enrollment
      * @return ResponseEntity<EnrollmentResponse>
-     * @throws DataNotFoundException, CreditLimitExceededException is thrown from this method
+     * @throws DataNotFoundException, CreditLimitExceededException can be thrown from this method
      */
     @PutMapping(path="/enroll")
-    public ResponseEntity<EnrollmentResponse> enrollStudentsEnrollment(@RequestBody Enrollment enrollment) throws DataNotFoundException, CreditLimitExceededException{
+    public ResponseEntity<EnrollmentResponse> enableStudentsEnrollment(@RequestBody Enrollment enrollment){
         log.info("StudentsController - Enroll Student");
 
         Enrollment e = enrollmentService.saveEnrollment(enrollment);
         //Enrollment Obj saved in DB, send Student id to client
-        return new ResponseEntity(new EnrollmentResponse(
+        return new ResponseEntity<EnrollmentResponse>(new EnrollmentResponse(
                 e.getStudent().getStudentId(),
                 e.getSemester().getSemId(),
                 e.getClassType().getClassName(),
@@ -76,17 +71,16 @@ public class EnrollmentController {
      * withdraw Enrollment for Semester and Class
      * @Param enrollment
      * @return ResponseEntity<EnrollmentResponse>
-     * @throws DataNotFoundException is thrown from this method
      */
     @PutMapping(path="/withdraw")
-    public ResponseEntity<EnrollmentResponse> withdrawStudentsEnrollment(@RequestBody Enrollment enrollment) throws DataNotFoundException {
+    public ResponseEntity<EnrollmentResponse> withdrawStudentsEnrollment(@RequestBody Enrollment enrollment) {
         log.info("StudentsController - Withdraw Student's Enrollment");
-        Enrollment e = enrollmentService.withdrawEnrollment(enrollment);
+        enrollmentService.withdrawEnrollment(enrollment);
         //Enrollment Obj saved in DB, send Student id to client
-        return new ResponseEntity(new EnrollmentResponse(
-                e.getStudent().getStudentId(),
-                e.getSemester().getSemId(),
-                e.getClassType().getClassName(),
+        return new ResponseEntity<EnrollmentResponse>(new EnrollmentResponse(
+                enrollment.getStudent().getStudentId(),
+                enrollment.getSemester().getSemId(),
+                enrollment.getClassType().getClassName(),
                 "Student's Enrollment is withdrawn. Use Get Request to get Enrollment Details"), HttpStatus.OK);
     }
 }

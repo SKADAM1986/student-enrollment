@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class SemesterService {
-    private final Logger log = LoggerFactory.getLogger(ClassService.class);
+    private final Logger log = LoggerFactory.getLogger(SemesterService.class);
     @Autowired
     SemesterRepository semesterRepository;
 
@@ -19,15 +19,22 @@ public class SemesterService {
     ObjectMapper objectMapper;
 
     public Semester createSemester(Semester semester){
-        log.info("Semester.createSemester()");
-        com.blockone.enrollment.entity.Semester s = semesterRepository.save(objectMapper.convertToEntity(semester));
-        return objectMapper.convertToModel(s);
+        log.info("Semester.createSemester() - [{}]", semester.getSemName());
+        //Save Semester Details to DB
+        return objectMapper.convertToModel(semesterRepository.save(objectMapper.convertToEntity(semester)));
     }
 
     @Cacheable("semester")
     public Semester getSemesterDetails(Long semId) {
-        log.info("Semester.getSemesterDetails()");
-        return objectMapper.convertToModel(semesterRepository.findBySemId(semId));
+        log.info("Semester.getSemesterDetails() - [{}]",semId);
+        com.blockone.enrollment.entity.Semester s = semesterRepository.findBySemId(semId);
+        if(s != null) {
+            log.info("Semester Object retrieved - [{}]", s);
+            return objectMapper.convertToModel(s);
+        } else {
+            log.error("Semester Object not found");
+            return null;
+        }
     }
 
 

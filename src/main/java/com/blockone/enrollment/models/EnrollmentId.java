@@ -1,31 +1,32 @@
-package com.blockone.enrollment.entity;
+package com.blockone.enrollment.models;
 
 import lombok.*;
-
-import javax.persistence.Embeddable;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import java.io.Serializable;
 
-@Embeddable
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class EnrollmentId implements Serializable {
+public class EnrollmentId implements Serializable, Comparable<EnrollmentId> {
 
-    @ManyToOne
-    @JoinColumn(name = "student_id")
-    private Student student;
+    private Long studentId;
+    private Long semId;
+    private String className;
 
-    @ManyToOne
-    @JoinColumn(name = "semester_id")
-    private Semester semester;
+    @Override
+    public int compareTo(EnrollmentId o) {
 
-    @ManyToOne
-    @JoinColumn(name = "class_name")
-    private ClassType classType;
+        int i = this.getStudentId().compareTo(o.getStudentId());
+        if (i != 0) return i;
 
+        i = this.getSemId().compareTo(o.getSemId());
+        if (i != 0) return i;
+
+        i = this.getClassName().compareTo(o.getClassName());
+        if (i != 0) return i;
+
+        return 1;
+    }
 }

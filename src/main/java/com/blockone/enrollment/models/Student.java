@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.Date;
 
 @Getter
 @Setter

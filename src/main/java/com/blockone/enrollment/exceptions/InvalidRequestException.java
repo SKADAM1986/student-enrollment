@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class InvalidRequestException extends RuntimeException{
-    private final Logger log = LoggerFactory.getLogger(InvalidRequestException.class);
+    private final transient Logger log = LoggerFactory.getLogger(InvalidRequestException.class);
 
     public InvalidRequestException(String message) {
         super(message);

@@ -1,6 +1,5 @@
 package com.blockone.enrollment.controllers;
 
-import com.blockone.enrollment.exceptions.InvalidRequestException;
 import com.blockone.enrollment.models.ClassType;
 import com.blockone.enrollment.service.ClassService;
 import org.slf4j.Logger;
@@ -31,14 +30,13 @@ public class ClassController {
      * @Param semesterId
      * @Param studentId
      * @return List<ClassType>
-     * @throws InvalidRequestException thrown from this method
      */
     @GetMapping(path={"/semesters/{semesterId}/students/{studentId}/classes",
     "/semesters/students/{studentId}/classes"})
     public List<ClassType> getClassesForStudentsInSemester(
             @PathVariable(value = "semesterId", required = false)  Long semesterId,
-            @PathVariable("studentId")  Long studentId) throws InvalidRequestException {
-        log.info("ClassController - Get Classes By Semester and Student - {} {}",semesterId,studentId );
+            @PathVariable("studentId")  Long studentId) {
+        log.info("ClassController - Get Classes By Semester and Student -[{}]{}",semesterId,studentId );
         return classService.getClassesBySemesterStudent(semesterId, studentId);
     }
 }

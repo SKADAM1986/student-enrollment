@@ -24,4 +24,8 @@ public class Enrollment {
 
     private boolean activeIndicator;
 
+    public EnrollmentId getEnrollmentId() {
+        return new EnrollmentId(this.student.getStudentId(), this.semester.getSemId(), this.classType.getClassName());
+    }
+
 }

@@ -1,7 +1,6 @@
 package com.blockone.enrollment.service;
 
 import com.blockone.enrollment.entity.Enrollment;
-import com.blockone.enrollment.exceptions.CreditLimitExceededException;
 import com.blockone.enrollment.exceptions.InvalidRequestException;
 import com.blockone.enrollment.models.ClassType;
 import com.blockone.enrollment.repository.ClassRepository;
@@ -12,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,8 +39,15 @@ public class ClassService {
      */
     @Cacheable("classType")
     public ClassType getClassType(String className) {
-        log.info("Get Class Type from className - {}", className);
-        return objectMapper.convertToModel(classRepository.findByClassName(className));
+        log.info("Get Class Type from className - [{}]", className);
+        com.blockone.enrollment.entity.ClassType c = classRepository.findByClassName(className);
+        if(c != null){
+            log.info("Class Object retrieved - [{}]", c);
+            return objectMapper.convertToModel(c);
+        } else {
+            log.error("Class Object not found");
+            return null;
+        }
     }
 
     /**
@@ -51,25 +58,27 @@ public class ClassService {
      * @return List<ClassType>
      * @throws InvalidRequestException thrown from this method
      */
-    public List<ClassType> getClassesBySemesterStudent(Long semId, Long studentId) throws InvalidRequestException {
-        log.info("ClassService - Get Classes By Semester and Student - {} {}",semId,studentId );
+    public List<ClassType> getClassesBySemesterStudent(Long semId, Long studentId){
+        log.info("ClassService - Get Classes By Semester Id [{}] and Student Id [{}]",semId,studentId );
         List<Enrollment> enrollments;
         if(semId != null && studentId != null) {
+            log.info("SemId and StudentId not null, Fetching Data from DB");
             enrollments = enrollmentRepository.findAllByEnrollmentId_SemesterSemIdAndActiveIndicatorIsTrueAndEnrollmentId_StudentStudentIdAndActiveIndicatorIsTrue(semId,studentId);
         } else if(semId == null && studentId != null) {
             //SemesterId is null, get Enrollments by Student Id
+            log.info("StudentId not null, Fetching Data from DB");
             enrollments = enrollmentRepository.findAllByEnrollmentId_StudentStudentIdAndActiveIndicatorIsTrue(studentId);
-        } else if(studentId == null && semId != null) {
-            //SemesterId is null, get Enrollments by Student Id
-            enrollments = enrollmentRepository.findAllByEnrollmentId_StudentStudentIdAndActiveIndicatorIsTrue(semId);
         } else {
-            throw new InvalidRequestException("Both Student Id and SemesterId is null. No matching criteria found");
+            //SemesterId is not null, get Enrollments by Semester Id
+            log.info("SemId not null, Fetching Data from DB");
+            enrollments = enrollmentRepository.findAllByEnrollmentId_SemesterSemIdAndActiveIndicatorIsTrue(semId);
         }
-
+        log.info("Size of enrollment list -> [{}]", + enrollments.size());
         //Retrieved all Enrollments, fetch all Classes from enrollments
-        if(enrollments == null || enrollments.isEmpty()) {
+        if(CollectionUtils.isEmpty(enrollments)) {
             return new ArrayList<>();
         } else {
+            //Extract ClassType from Enrollment List
             return enrollments.stream().map(e -> objectMapper.convertToModel(e.getEnrollmentId().getClassType())).collect(Collectors.toList());
         }
     }

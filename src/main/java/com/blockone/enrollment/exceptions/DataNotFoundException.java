@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DataNotFoundException extends RuntimeException {
-    private final Logger log = LoggerFactory.getLogger(DataNotFoundException.class);
+    private final transient Logger log = LoggerFactory.getLogger(DataNotFoundException.class);
 
     public DataNotFoundException(String message) {
         super(message);

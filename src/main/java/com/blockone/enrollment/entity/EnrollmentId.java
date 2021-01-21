@@ -28,4 +28,13 @@ public class EnrollmentId implements Serializable {
     @JoinColumn(name = "class_name")
     private ClassType classType;
 
+    public String getEnrollmentIdToPrint() {
+
+        return "EnrollmentId{" +
+                "studentId=" + student.getStudentId() +
+                ", semesterId=" + semester.getSemId() +
+                ", className=" + classType.getClassName() +
+                '}';
+    }
+
 }

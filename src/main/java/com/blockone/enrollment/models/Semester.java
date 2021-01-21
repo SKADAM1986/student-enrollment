@@ -2,7 +2,8 @@ package com.blockone.enrollment.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
-import java.util.Date;
+
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -17,9 +18,9 @@ public class Semester {
     private String semName;
 
     @JsonFormat(pattern="MM/dd/yyyy")
-    private Date startDate;
+    private LocalDate startDate;
 
     @JsonFormat(pattern="MM/dd/yyyy")
-    private Date endDate;
+    private LocalDate endDate;
 
 }
