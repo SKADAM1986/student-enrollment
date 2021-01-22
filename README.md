@@ -78,7 +78,7 @@ Download source code from git-hub web page.
 
 OR
 
-Travese to directory where you want to download the code
+Traverse to directory where you want to download the code
 
 With command line, Execute below command to clone repository on local machine
 
@@ -129,19 +129,17 @@ Travese to directory where you want to download the code (student-enrollment)
      5. Install MySQL in seperate container
      6. Create required database schema as per configuration mentioned in the source code
      
-     
-
 # Technical Details
 
+    Technology Stack:
 
+        Java 1.8, Spring Framework, Spring Data JPA, JUnit 5, Docker, MySQL 8.0
 
-Refer document for test scenarios - attach Test Document
+    Find below attached document for Database details
 
-Share endpoints and Request sample payload
+        [Database Details are attached](./DB_Details)
 
+    Please refer to below Testing Reference Document to get information about APIs
 
-DB Information
-
-
-
+        [Testing Reference Document](./Student_Enrollment_System_Test_Guide.docx)
 
