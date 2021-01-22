@@ -1,8 +1,8 @@
-package com.blockone.enrollment.models;
+package com.blockone.enrollment.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
 
@@ -11,17 +11,20 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-@EqualsAndHashCode
+@Entity
+@Table(name="semester")
 public class Semester implements Serializable {
 
+    @Id @GeneratedValue @Column(name="semester_id")
     private Long semesterId;
 
+    @Column(name="semester_name")
     private String semesterName;
 
-    @JsonFormat(pattern="MM/dd/yyyy")
+    @Column(name="start_date")
     private LocalDate startDate;
 
-    @JsonFormat(pattern="MM/dd/yyyy")
+    @Column(name="end_date")
     private LocalDate endDate;
 
 }
