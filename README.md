@@ -131,15 +131,15 @@ Travese to directory where you want to download the code (student-enrollment)
      
 # Technical Details
 
-    Technology Stack:
+Technology Stack:
 
-        Java 1.8, Spring Framework, Spring Data JPA, JUnit 5, Docker, MySQL 8.0
+   Java 1.8, Spring Framework, Spring Data JPA, JUnit 5, Docker, MySQL 8.0
 
-    Find below attached document for Database details
+Find below attached document for Database details
 
-        [Database Details are attached](./DB_Details)
+   [Database Details are attached](./DB_Details)
 
-    Please refer to below Testing Reference Document to get information about APIs
+Please refer to below Testing Reference Document to get information about APIs
 
-        [Testing Reference Document](./Student_Enrollment_System_Test_Guide.docx)
+   [Testing Reference Document](./Student_Enrollment_System_Test_Guide.docx)
 
